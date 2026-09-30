@@ -1,0 +1,19 @@
+# Ejercicios de UD01 que no quiero subir
+UD01IntroduccionPython/EjercicioObligatorio/
+UD01IntroduccionPython/EjerciciosTeoria
+UD01IntroduccionPython/EjerciciosVoluntarios
+# Material adicional que no quiero subir
+UD01IntroduccionPython/1.AD_INtroducción a Python.pdf
+UD01IntroduccionPython/5.Actividades teoría-20251221.zip
+UD01IntroduccionPython/6.Ejercicios-20251221.zip
+UD01IntroduccionPython/7.Ejercicio_obligatorio-20251221.zip
+UD01IntroduccionPython/8.mementopython3-english.pdf
+UD01IntroduccionPython/UD01-Actividades_Voluntarias&Obligatorio_OscarGarcia.odt
+# Archivos temporales de LibreOffice
+.~lock.*
+
+# Unidades que no quiero subir de momento
+ProyectosPython/
+UD02Python_SQL/
+UD03PersistenciaDatosEnFicheros/
+UD04PersistenciaBDA/
