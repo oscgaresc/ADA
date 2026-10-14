@@ -1,7 +1,25 @@
+# --- Python y Caché ---
+__pycache__/
+*.pyc
+*.pyo
+
+# --- Entornos virtuales ---
+venv/
+env/
+.venv/
+
+# --- Configuraciones de editores ---
+.vscode/
+.idea/
+
 # Ejercicios de UD01 que no quiero subir
 UD01IntroduccionPython/EjercicioObligatorio/
 UD01IntroduccionPython/EjerciciosTeoria
 UD01IntroduccionPython/EjerciciosVoluntarios
+# Ejercicios de UD02 que no quiero subir
+UD02Python_SQL/2.Recursos SQLite-20251221/
+UD02Python_SQL/5.Actividades teoría-20251221/
+
 # Material adicional que no quiero subir
 UD01IntroduccionPython/1.AD_INtroducción a Python.pdf
 UD01IntroduccionPython/5.Actividades teoría-20251221.zip
@@ -9,11 +27,22 @@ UD01IntroduccionPython/6.Ejercicios-20251221.zip
 UD01IntroduccionPython/7.Ejercicio_obligatorio-20251221.zip
 UD01IntroduccionPython/8.mementopython3-english.pdf
 UD01IntroduccionPython/UD01-Actividades_Voluntarias&Obligatorio_OscarGarcia.odt
+UD02Python_SQL/1.UD2-1 Introducción a las bases de datos_cs.pdf
+UD02Python_SQL/2.Recursos SQLite-20251221.zip
+UD02Python_SQL/4.AD_Acceso a BDA con Python y SQLite.pdf 
+UD02Python_SQL/8.Ejercicios-20251221.zip
+UD02Python_SQL/9.Ejercicio obligatorio-20251221.zip
+UD02Python_SQL/ejers_voluntarios*
+UD02Python_SQL/pruebas.txt
+UD02Python_SQL/pruebas.txt
+UD02-Actividades_Voluntarias&Obligatorio_OscarGarcia.odt
+UD02Python_SQL\EjerciciosVoluntarios_Obligatorio\Soluciones\
+UD02Python_SQL\EjerciciosVoluntarios_Obligatorio\UD2-Ejercicios voluntarios_cs.pdf
 # Archivos temporales de LibreOffice
 .~lock.*
 
 # Unidades que no quiero subir de momento
 ProyectosPython/
-UD02Python_SQL/
+
 UD03PersistenciaDatosEnFicheros/
 UD04PersistenciaBDA/
