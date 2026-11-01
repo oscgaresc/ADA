@@ -1,0 +1,144 @@
+html->obj
+--------------
+1. Obtener texto del editor 
+2. Obtener objeto html con BeautifulSoup a partir del texto del editor y html.parser
+NOTA: con este objeto ya podemos buscar cosas dentro del objeto html
+
+3. Obtener una lista de divs de clase libro (list[str])
+4. Hacer un for para la procesar cada uno de los divs y obtener una lista de Productos
+5. Mostrar en el editor cada uno de los objetos Producto obtenidos.
+NOTA: en el editor solo se puede mostrar texto (habrá que montar un str con todos 
+los objetos, cada objeto debe tener un \n (como separador))
+
+obj->html
+--------------
+1. Obtener el texto del editor
+2. Obtener una lista de objetos_texto separando por \n 
+3. Puede que se haya colado basura del editor. La veremos 
+, si depuramos, como elementos '' dentro de la lista.
+DEBEMOS ELIMINAR DICHOS ELEMENTOS DE LA LISTA.
+4. Ahora ya podemos crear con BeautifulSoup el html
+
+Trozo de código: genera un esqueleto con todo menos los libros
+# creamos el documento HTML con beautifulsoup
+soup = BeautifulSoup('<html><head></head><body></body><footer></footer></html>', 'html.parser')
+title = soup.new_tag('title')
+title.string = 'Libros de la librería'
+soup.head.append(title)
+style = soup.new_tag('style')
+style.string = '''body {text-align: center;}
+h1 {color: grey;}
+h2 {color: navy;}
+.precio {font-weight: bold}
+footer {background: gray; color: white; margin: 20px;padding: 20px;}
+'''
+soup.head.append(style)
+h1 =soup.new_tag('h1')
+h1.string = 'librería'
+soup.body.append(h1)
+soup.footer.string='Me gusta Python'
+
+5. Ahora solo queda insertar cada uno de libros en el lugar correspondiente:
+Hacer un bucle para cada objeto_texto de la lista de objetos_texto:
+Obtener un objeto Python con eval
+A partir del objeto Python podemos construir el html correspondiente.
+
+6. Una vez conseguido todo con texto_html = soup.prettify() ya podemos mostrar 
+texto_html en el editor.
+
+csv->obj
+-------------
+1. En texto_csv cargamos lo que hay en el editor
+2. Convertimos el texto_csv en lista_cadenas (split(sep='\n'))
+3. Creamos un iterador_lista_cadenas con iter(lista_cadenas)
+4. Ya podemos crear un csv.reader con el iterador y el delimiter.
+5. Teniendo en cuenta que hay cabecera ya podemos obtener los datos de cada fila
+en un bucle para crear un objeto Producto.
+6. Terminado el bucle se supone que tenemos una lista_productos (con objetos Producto)
+7. Mostramos los productos en el editor pasándolos a str y poninendo un '\n'
+entre cada uno de ellos.
+
+obj-> csv
+--------------
+1. Obtener el texto del editor
+2. Obtener una lista de objetos_texto separando por '\n' 
+3. Puede que se haya colado basura del editor. La veremos 
+, si depuramos, como elementos '' dentro de la lista.
+DEBEMOS ELIMINAR DICHOS ELEMENTOS DE LA LISTA.
+4. creamos la cabecera csv "genero,titulo,autor,precio,disponible\n"
+5. Ahora de la lista de objetos_texto, vamos cogiendo de uno en uno con un for
+y con eval los pasamos a objetos python para poder examinar su contenido
+y generar una línea con los campos separados por ',' y un '\n' al final.
+6. Finalmente mostramos en el editor.
+
+json->obj
+-------------
+1. Obtenemos texto_json del editor
+2. obtenemos una lista de Productos mediante json.loads debemos usar como_productos para 
+indicar como obtener un producto a partir de un diccionario JSON
+3. borramos el editor
+4. A partir de la lista de Productos producimos un texto que mostraremos en el editor.
+NOTA: cada producto debe ir en una línea diferente. Cada producto excepto el último 
+debe tener un '\n' al final.
+
+obj->json
+------------
+1. Obtenemos el texto de objetos del editor
+2. Obtenemos una lista de objetos separando por '\n'
+3. Puede que se haya colado basura del editor. La veremos 
+, si depuramos, como elementos '' dentro de la lista.
+DEBEMOS ELIMINAR DICHOS ELEMENTOS DE LA LISTA.
+4. creamos una variable libros_json inicializada a '['
+5. En un for para cada objeto (de texto) de la lista:
+    Le hacemos un eval para obtener un objeto real
+    libros_json += ¡json.dumps pasando el objeto real y ProductoEncoder
+    añadiremos entre cada libro ',' 
+6. cerramos libros_json con ']'
+7. NOTA: si ponemos una ',' tras el último libro -> PROBLEMAS ya que noes JSON
+8. Borramos el editor y mostramos libros_json.
+
+pickle->obj
+-------------
+1. Tenemos los objetos_pickle (byte) en una variable global lista_objetos_pickle
+2. Para cada objeto_pickle de esa lista: mediante pickle.loads lo añadimos a 
+una lista de objetos_producto
+NOTA: estos objetos ya son Python
+3. Borramos el editor.
+4. Mostramos los productos en el editor pasándolos a str y poninendo un '\n'
+entre cada uno de ellos.
+
+obj->pickle
+-------------
+1. Vaciamos la variable global lista_objetos_pickle
+2. Obtenemos el texto de objetos del editor
+3. Obtenemos una lista de objetos separando por '\n'
+4. Puede que se haya colado basura del editor. La veremos 
+, si depuramos, como elementos '' dentro de la lista.
+DEBEMOS ELIMINAR DICHOS ELEMENTOS DE LA LISTA.
+5. En un for para cada objeto (de texto) de la lista:
+    Le hacemos un eval para obtener un objeto real
+    Añadimos a la lista_objetos_pickle el resultado de aplicar pickle.dumps
+6. Borramos el editor
+7. Añadimos la lista_objetos_pickle al editor (objetos byte)  
+
+
+TEMA DE CAPTURA DE EXCEPCIONES
+--------------------------------
+Hay que capturar las excepciones Exception y refinar los posibles errores 
+a excepciones más concretas para informar al usuario de lo que pasa mediante un 
+mensaje de error adeuado. Por supuesto, el programa debe quedar en un estado 
+estable y permitir al usuario corregir el problema.
+
+Por ejemplo, en xml->obj se vigilan los siguientes casos:
+    - Que no haya nada en el editor.
+    - Que no el fichero no sea compatible con XML (Falla el parser)
+Este código permite averiguar el tipo de excepción y se puede personalizar luego 
+con la excepción concreta para dar un mensaje más adecuado al usuario: 
+except Exception as e:
+        tmb.showerror("Error", f'{e}')
+
+Hacer debugging también ayuda para saber donde se produce una excepción.
+y de que tipo es.
+
+
+

@@ -1,0 +1,19 @@
+[{
+    "genero": "Ciencia Ficci\u00f3n",
+    "titulo": "La Fundaci\u00f3n",
+    "autor": "Isaac Asimov",
+    "precio": 25.99,
+    "disponible": true
+},{
+    "genero": "Fantas\u00eda",
+    "titulo": "Juego de Tronos",
+    "autor": "George R.R. Martin",
+    "precio": 29.99,
+    "disponible": false
+},{
+    "genero": "Aventura",
+    "titulo": "La isla del tesoro",
+    "autor": "Robert Louis Stevenson",
+    "precio": 18.99,
+    "disponible": true
+}]

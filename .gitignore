@@ -12,13 +12,19 @@ env/
 .vscode/
 .idea/
 
-# Ejercicios de UD01 que no quiero subir
+# Ejercicios de UD01 que no quiero subir (directorios)
 UD01IntroduccionPython/EjercicioObligatorio/
 UD01IntroduccionPython/EjerciciosTeoria
 UD01IntroduccionPython/EjerciciosVoluntarios
-# Ejercicios de UD02 que no quiero subir
+# Ejercicios de UD02 que no quiero subir (directorios)
 UD02Python_SQL/2.Recursos SQLite-20251221/
 UD02Python_SQL/5.Actividades teoría-20251221/
+UD02Python_SQL/EjerciciosVoluntarios_Obligatorio/Soluciones/
+
+# Ejercicios de la UD03 que no quiero subir (directorios)
+UD03PersistenciaDatosEnFicheros/6.Actividades_funciones/
+UD03PersistenciaDatosEnFicheros/8.Actividades Persistencia_de_Datos_en_Ficheros/
+UD03PersistenciaDatosEnFicheros/13.Ejercicio_obligatorio/Recursos Tkinter/
 
 # Material adicional que no quiero subir
 UD01IntroduccionPython/1.AD_INtroducción a Python.pdf
@@ -27,9 +33,9 @@ UD01IntroduccionPython/6.Ejercicios-20251221.zip
 UD01IntroduccionPython/7.Ejercicio_obligatorio-20251221.zip
 UD01IntroduccionPython/8.mementopython3-english.pdf
 UD01IntroduccionPython/UD01-Actividades_Voluntarias&Obligatorio_OscarGarcia.odt
+
 UD02Python_SQL/1.UD2-1 Introducción a las bases de datos_cs.pdf
 UD02Python_SQL/2.Recursos SQLite-20251221.zip
-UD02Python_SQL/5.Actividades teoría-20251221.zip 
 UD02Python_SQL/4.AD_Acceso a BDA con Python y SQLite.pdf 
 UD02Python_SQL/8.Ejercicios-20251221.zip
 UD02Python_SQL/9.Ejercicio obligatorio-20251221.zip
@@ -37,13 +43,17 @@ UD02Python_SQL/ejers_voluntarios*
 UD02Python_SQL/pruebas.txt
 UD02Python_SQL/pruebas.txt
 UD02-Actividades_Voluntarias&Obligatorio_OscarGarcia.odt
-UD02Python_SQL/EjerciciosVoluntarios_Obligatorio/Soluciones/
 UD02Python_SQL/EjerciciosVoluntarios_Obligatorio/UD2-Ejercicios voluntarios_cs.pdf
+UD02Python_SQL/EjerciciosVoluntarios_Obligatorio/EjercicioObligatorio/UD2-Ejercicio obligatorio_cs.pdf
+
+UD03PersistenciaDatosEnFicheros/*.zip
+UD03PersistenciaDatosEnFicheros/AD*.pdf
+UD03PersistenciaDatosEnFicheros/*.odt
+UD03PersistenciaDatosEnFicheros/13.Ejercicio_obligatorio/Recursos Python/app_files.py
 # Archivos temporales de LibreOffice
 .~lock.*
 
 # Unidades que no quiero subir de momento
 ProyectosPython/
 
-UD03PersistenciaDatosEnFicheros/
 UD04PersistenciaBDA/
