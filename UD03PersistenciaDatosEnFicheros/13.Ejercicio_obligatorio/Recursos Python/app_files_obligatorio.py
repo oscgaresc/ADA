@@ -51,12 +51,12 @@ def seleccionar_fichero(editor):
     dlg_selec = tfd.askopenfilename( # ventana para localizar ficheros
         title='Seleccionar un fichero',
         initialdir='/', # se podría añadir la carpeta ficheros de muestra
-        filetypes= (('Fichero de texto', '*.txt'),
+        filetypes= (('Todos los ficheros', '*.*'), # lo añado primero para que aparezcan todos por defecto
+                    ('Fichero de texto', '*.txt'),
                     ('Fichero de xml', '*.xml'),
                     ('Fichero de html', '*.html'),
                     ('Fichero de csv', '*.csv'),
-                    ('Fichero de json', '*.json'),
-                    ('Todos los ficheros', '*.*')))
+                    ('Fichero de json', '*.json')))
     
     # leemos todo el fichero y se añade encoding='utf-8' al utilizar windows
     with open(dlg_selec, 'r', encoding='utf-8') as fr:
@@ -125,7 +125,7 @@ def xml_a_objetos(editor):
         if str_xml_editor =='\n':
             raise Exception('No hay libros o se ha cargado un xml no compatible.')
         
-        xml = ET.fromstring(str_xml_editor)
+        xml = ET.fromstring(str_xml_editor) # es estricto, en caso de no ser un documento xml
         productos_xml = xml.findall('libro') # retorna una lista de productos
         for producto_xml in productos_xml:
             productos.append(extraer_producto_de_xml(producto_xml))
@@ -133,8 +133,7 @@ def xml_a_objetos(editor):
             raise Exception("No hay libros o se ha cargado un xml no compatible.")
 
     except SyntaxError:
-        tmb.showerror("Error", "Parece que la sintaxis no es XML.")
-        # No se añade el icono "warning", aunque se puede probar 
+        tmb.showerror("Error", "Parece que la sintaxis no es XML.") # muestra ventana emergente de error 
     except Exception as e:
         tmb.showerror("Error", f'{e}')
     else:
@@ -173,15 +172,23 @@ def objetos_a_xml(editor):
             raise Exception("No hay objetos.")
         
     except Exception as e:
-        tmb.showerror("Error", f'{e}')
+        tmb.showerror("Error", f'{e}') 
+        # no se si se considera un error que intente coger cualquier objeto y transformarlo
 
     else:
         # creamos elementos libro
         for libro in lista_objetos:
             try:
-                objeto_producto = eval(libro)
+                objeto_producto = eval(libro) 
+                # eval(), evalúa cualquier tipo de dato, por lo que es conveniente comprobar si
+                # el tipo de dato es de tipo Producto de la siguiente manera:
+                if not isinstance(objeto_producto, Producto):
+                    raise ValueError(f'El elemento {libro} no es un objeto Producto válido.')
+                
             except Exception as e:
-                tmb.showerror("Error", f'{e}')
+                tmb.showerror("Error", f'Línea inválida, no representa un objeto Producto'+
+                              f' válido:\n{libro}\n\n{e}')
+                return # se cierra la función sin que realice cambios para mejorar la ux
             else:
                 libro_xml = ET.Element('libro', attrib=dict(genero=objeto_producto.genero))
                 # creamos subelementos libro y los enganchamos
@@ -220,8 +227,14 @@ def html_a_objetos(editor):
 
         if str_html_editor =='\n':
             raise Exception('No hay libros o se ha cargado un html no compatible.')
+        # Antes de pasar al siguiente bloque, con BeautifulSoup, es conveniente comprobar
+        # si el html tiene un formato similar, es decir, "<" o ">".
+        if '<' not in str_html_editor or '>' not in str_html_editor: 
+            raise Exception('Parece que la sintaxis no es HTML.')
+        
         # paso 2: Se obtiene objeto html con BeautifulSoup con la librería lxml que es más rápida
         html = BeautifulSoup(str_html_editor,'lxml')
+
         # paso 3: Se obtiene una lista de divs de clase libro (list[str])
         productos_divs_html = html.find_all('div', class_ = 'libro')
         # se obtiene una lista de strings -> (list[str]) llamada productos
@@ -233,7 +246,7 @@ def html_a_objetos(editor):
             productos.append(extraer_producto_de_html(producto_html))
         
         if not productos:
-            raise Exception("No hay productos 'libros' o se ha cargado un html no compatible.")        
+            raise Exception("No hay libros o se ha cargado un html no compatible.")        
 
     except SyntaxError:
         tmb.showerror("Error", "Parece que la sintaxis no es HTML.")
@@ -307,8 +320,15 @@ def objetos_a_html(editor):
             libro = libro.strip()
             try:
                 objeto_producto = eval(libro) # se obtiene el objeto producto
+                # eval(), evalúa cualquier tipo de dato, por lo que es conveniente comprobar si
+                # el tipo de dato es de tipo Producto de la siguiente manera:
+                if not isinstance(objeto_producto, Producto):
+                    raise ValueError(f'El elemento {libro} no es un objeto Producto válido.')
+                
             except Exception as e:
-                tmb.showerror("Error", f'{e}')
+                tmb.showerror("Error", f'Línea inválida, no representa un objeto Producto'+
+                                f' válido:\n{libro}\n\n{e}')
+                return # se cierra la función sin que realice cambios para mejorar la ux
             else:
                 div_libro =soup.new_tag('div', attrs={'class':'libro'})
                 h2_genero =soup.new_tag('h2')
