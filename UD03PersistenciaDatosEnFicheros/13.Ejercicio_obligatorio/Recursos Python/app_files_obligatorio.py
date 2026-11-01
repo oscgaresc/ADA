@@ -22,8 +22,7 @@ from dataclasses import dataclass   # almacenamiento de datos en objetos Python
 
 @dataclass
 class Producto():
-    '''
-    clase para guardar los datos
+    '''clase para guardar los datos de unos productos libro
     '''
     genero: str
     titulo: str
@@ -110,18 +109,6 @@ def extraer_producto_de_html(producto_html):
     autor = producto_html.find('div', class_='autor').text.strip()
     precio = producto_html.find('div', class_='precio').text.strip()
     disponible = producto_html.find('div', class_='disponible').text.strip()
-    disponible = True if disponible == 'si' else False
-    return Producto(genero, titulo, autor, precio, disponible)
-
-def extraer_producto_de_csv(producto_csv):
-    '''Extrae la información de un csv de cada producto libro y lo transforma en un objeto Producto
-    Args:
-        producto_csv(List): lista con el contenido csv de cada producto libro
-    
-    Returns:
-        Out(Producto): Objeto Producto que almacena la información del producto
-    ''' 
-    genero, titulo, autor, precio, disponible = producto_csv.split(',')
     disponible = True if disponible == 'si' else False
     return Producto(genero, titulo, autor, precio, disponible)
 
