@@ -49,7 +49,7 @@ UD02Python_SQL/EjerciciosVoluntarios_Obligatorio/EjercicioObligatorio/UD2-Ejerci
 UD03PersistenciaDatosEnFicheros/*.zip
 UD03PersistenciaDatosEnFicheros/*AD*.pdf
 UD03PersistenciaDatosEnFicheros/*.odt
-UD03PersistenciaDatosEnFicheros/13.Ejercicio_obligatorio/Recursos Python/app_files.py
+UD03PersistenciaDatosEnFicheros/13.Ejercicio_obligatorio/Recursos Python/*files.py
 # Archivos temporales de LibreOffice
 .~lock.*
 
@@ -57,3 +57,4 @@ UD03PersistenciaDatosEnFicheros/13.Ejercicio_obligatorio/Recursos Python/app_fil
 ProyectosPython/
 
 UD04PersistenciaBDA/
+UD05SQLAlchemy/
