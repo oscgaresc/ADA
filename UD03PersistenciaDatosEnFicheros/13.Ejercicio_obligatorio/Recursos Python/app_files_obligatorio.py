@@ -551,7 +551,7 @@ def objetos_a_csv(editor):
         # paso 5: Se pasa el contenido del editor a objetos Productos con el
         # método eval para usarlo para generar el csv
         for libro in lista_objetos:
-                    # Limpiando espacios en blanco para evitar errores
+            # Limpiando espacios en blanco para evitar errores
             libro = libro.strip()
             try:
                 prod = eval(libro) # se obtiene el objeto producto
@@ -576,6 +576,9 @@ def como_productos(dct):
     '''Retorna un objeto Producto a partir de un diccionario
     Args:
         dct(dict): diccionario con la información necesaria para crear un objeto Producto
+
+    Returns:
+        Out(Producto): Objeto Producto
     '''
     return Producto(dct['genero'], dct['titulo'], dct['autor'],
                     dct['precio'], dct['disponible'])
@@ -596,7 +599,45 @@ def json_a_objetos(editor):
     Args:
         editor(ScrolledText): zona para editar/visualizar datos
     '''
-    pass
+    try:
+        # paso 1: Se obtiene texto del editor.
+        productos=[]
+        str_json_editor = editor.get('1.0', 'end-1c')
+
+        # if str_json_editor =='\n':
+        #     raise Exception('No hay libros o se ha cargado un json no compatible.')
+
+        # Comprobando formato del editor tkinter
+        formato = detecta_formato_tkinter(str_json_editor)
+        if not formato =='json':
+            tmb.showerror('ERROR DE FORMATO',f'Se detecta formato {formato.upper()}, no JSON')
+            return # evita que recorra más código
+
+        # paso 2. Se obtiene una lista de Productos mediante json.loads, usando como_productos
+        # para indicar como obtener un producto a partir de un diccionario JSON
+        # se utiliza json.loads, con "s", para cargar una cadena de texto no un texto abierto,
+        # además la cadena de texto debe contener todo el json en un string
+        productos = json.loads(str_json_editor, object_hook=como_productos)
+
+        if not productos:
+            raise Exception("No hay productos 'libros' o se ha cargado"\
+                            " un json no compatible.")        
+        
+    except SyntaxError:
+        tmb.showerror("Error", "Parece que la sintaxis no es JSON.")
+        # No se añade el icono "warning", aunque se puede probar 
+    except Exception as e:
+        tmb.showerror("Error", f'{e}')
+    else:
+        # paso 3. Se muestra en el editor los objetos Producto obtenidos.
+        # se muestra en el editor
+        editor.delete('1.0','end') # primero se borra
+
+        # "separador".join(COLECCIÓN_DE_ELEMENTOS) -> 2 opciones
+        texto_a_insertar = '\n'.join(str(producto) for producto in productos)
+
+        # se añade los productos a la interfaz tkinter            
+        editor.insert(f'1.0',texto_a_insertar)
 
 
 def objetos_a_json(editor):
@@ -604,7 +645,70 @@ def objetos_a_json(editor):
     Args:
         editor(ScrolledText): zona para editar/visualizar datos
     '''
-    pass
+    try:
+        # paso 1. Se obtiene el texto del editor
+        texto_objetos = editor.get('1.0','end-1c') # 1c para evitar el \n final
+        # de Tkinter, que da problemas
+
+        # Comprobando formato del editor tkinter
+        formato = detecta_formato_tkinter(texto_objetos)
+        if not formato =='objeto Producto':
+            tmb.showerror('ERROR DE FORMATO',f'Se detecta formato {formato.upper()}, no OBJETO PRODUCTO')
+            return # evita que recorra más código
+
+        # paso 2. Se obtiene una lista de texto_objetos separando por \n
+        lista_objetos = texto_objetos.split(sep='\n')
+
+        # paso 3. Se quita basura ('')
+        while True:
+            try:
+                lista_objetos.remove('')
+            except ValueError:
+                break
+
+        if not lista_objetos:
+            raise Exception("No hay objetos.")
+
+    except Exception as e:
+        tmb.showerror("Error", f'{e}')
+
+    else:
+        # paso 4: Se crea una variable productos_json inicializada a '[' eliminada
+        # se crea directamente una lista
+        lista_productos = []
+        # productos_json.append('[') # inicio del json
+        # paso 5: Se pasa el contenido del editor a objetos Productos con el
+        # método eval para usarlo para completar la lista de productos
+        for libro in lista_objetos:
+            # Limpiando espacios en blanco para evitar errores
+            libro = libro.strip()
+            try:
+                prod = eval(libro) # se obtiene el objeto producto
+            except Exception as e:
+                tmb.showerror("Error", f'{e}')
+            else:
+                # Añado todos los productos a una lista de productos_json             
+                lista_productos.append(prod)
+
+        # Finalmente no se hace uso de __dict__ 
+        # Se añade directamente la lista de productos en json.dumps() 
+        # 1. Se añade la lista a realizar dumps lista_productos
+        # 2. cls apunta a la funcion ProductoEncoder si es objeto o
+        # se ha pasado a diccionario
+        # 3. indent que crea una indentación de 4 espacios
+        # 4. ensure_ascii = False, para que no haya problemas con los caracteres
+        # especiales del castellano         
+        productos_json = json.dumps(lista_productos, cls=ProductoEncoder, indent=4,
+                                    ensure_ascii=False) 
+        # De esta manera se realiza un único dumps para que cree los corchetes y
+        # las comas necesarias, evitando realizarlo de manera manual con un for
+        # por productos y realizar manualmente los corchetes y las comas entre
+        # productos.            
+
+        # mostramos en el editor
+        editor.delete('1.0','end')
+
+        editor.insert(f'1.0', productos_json)
 
 # VARIABLE GLOBAL
 lista_objetos_pickle = []
