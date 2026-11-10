@@ -112,6 +112,74 @@ def extraer_producto_de_html(producto_html):
     disponible = True if disponible == 'si' else False
     return Producto(genero, titulo, autor, precio, disponible)
 
+def extraer_producto_de_csv(producto_csv):
+    '''Extrae la información de un csv de cada producto libro y lo transforma en un objeto Producto
+    Args:
+        producto_csv(List): lista con el contenido csv de cada producto libro
+    
+    Returns:
+        Out(Producto): Objeto Producto que almacena la información del producto
+    ''' 
+    genero, titulo, autor, precio, disponible = producto_csv.split(',')
+    disponible = True if disponible == 'si' else False
+    return Producto(genero, titulo, autor, precio, disponible)
+
+def detecta_formato_tkinter(str_editor):
+    '''Analiza el contenido del editor y devuelve el formato detectado.
+
+    Args:
+        str_editor(str): contenido del editor tkinter
+    
+    Returns:
+        Out (str): 'vacio', 'html', 'xml', 'json', 'pickle', 'objeto Producto', 'csv' o 'desconocido'
+    '''
+    # Paso 1: se comprueba si está vacío
+    texto = str_editor.strip()
+    if not texto: return "vacío"
+    
+    # Paso 2: se comprueba si es html (antes del xml ya que tienen formato parecido)
+    # se recoge los primeros 200 caracteres minúscula para comprobar etiquetas
+    inicio = texto.lower()[:200] 
+    # True si cualquiera (any) de las etiquetas html añadidas se encuentran en inicio
+    if any(etiqueta in inicio for etiqueta in ['<html','<body','<div','!doctype html']):
+        return "html"
+
+    # Paso 3: se comprueba si es xml (después del html ya que se puede confundir)
+    if texto.startswith('<?xml') or (texto.startswith('<') and texto.endswith('>')):
+        try:
+            ET.fromstring(texto) # es bastante estricto
+            return 'xml'
+        except ET.ParseError:
+            pass # si no es xml continua comprobando el tipo de texto
+
+    # Paso 4: se comprueba si es json, comprobando si empiezan/acaban con {} o con []
+    if (texto.startswith('{') and texto.endswith('}')) or\
+        (texto.startswith('[') and texto.endswith(']')):
+        try:
+            json.loads(texto)
+            return "json"
+        except json.JSONDecodeError:
+            pass # si no es json continua comprobando el tipo de texto
+
+    # Paso 5: se comprueba si es pickle(a través de formato hexadecimal/binario
+    # o marcas de protocolo)
+    if r'\x80\x03' in texto or '\x80\x04' in texto or texto.startswith('b'):
+        return "pickle"
+
+    # Paso 6: se comprueba si es un objeto Producto
+    if (texto.startswith('Producto(') and texto.endswith(')')):
+        return "objeto Producto"
+
+    # Se añade al final debido a que se puede confundir con los formatos anteriores
+    # Paso 7: se comprueba si es csv a través de líneas estucturadas con comas/separadores
+    lineas = [l for l in texto.split('\n') if l.strip()] # elimina las lineas vacías
+    # 
+    if len(lineas)>0 and ',' in lineas[0]:
+        return "csv"
+
+    # Si no es xml, html, csv, json, pickle o vacío no es un formato conocido
+    return "desconocido"
+
 
 def xml_a_objetos(editor):
     '''Parsea el texto XML y lo convierte en objetos Producto.
@@ -122,11 +190,19 @@ def xml_a_objetos(editor):
         productos = []
         str_xml_editor = editor.get('1.0', 'end')
 
-        if str_xml_editor =='\n':
-            raise Exception('No hay libros o se ha cargado un xml no compatible.')
+        # if str_xml_editor =='\n':
+        #     raise Exception('No hay libros o se ha cargado un xml no compatible.')
+
+        # Comprobando formato del editor tkinter
+        formato = detecta_formato_tkinter(str_xml_editor)
+        if not formato =='xml':
+            tmb.showerror('ERROR DE FORMATO',f'Se detecta formato {formato.upper()}, no XML')
+            return # evita que recorra más código
         
+        # ya es seguro realizar la extracción del formato xml
         xml = ET.fromstring(str_xml_editor) # es estricto, en caso de no ser un documento xml
         productos_xml = xml.findall('libro') # retorna una lista de productos
+        
         for producto_xml in productos_xml:
             productos.append(extraer_producto_de_xml(producto_xml))
         if not productos:
@@ -159,6 +235,13 @@ def objetos_a_xml(editor):
 
         # leemos los objetos del editor
         texto_objetos = editor.get('1.0','end')
+
+        # Comprobando formato del editor tkinter
+        formato = detecta_formato_tkinter(texto_objetos)
+        if not formato =='objeto Producto':
+            tmb.showerror('ERROR DE FORMATO',f'Se detecta formato {formato.upper()}, no OBJETO PRODUCTO')
+            return # evita que recorra más código
+
         lista_objetos = texto_objetos.split(sep='\n')
 
         # quito basura 
@@ -225,12 +308,15 @@ def html_a_objetos(editor):
         productos=[]
         str_html_editor = editor.get('1.0', 'end')
 
-        if str_html_editor =='\n':
-            raise Exception('No hay libros o se ha cargado un html no compatible.')
+        # if str_html_editor =='\n':
+        #     raise Exception('No hay libros o se ha cargado un html no compatible.')
         # Antes de pasar al siguiente bloque, con BeautifulSoup, es conveniente comprobar
         # si el html tiene un formato similar, es decir, "<" o ">".
-        if '<' not in str_html_editor or '>' not in str_html_editor: 
-            raise Exception('Parece que la sintaxis no es HTML.')
+        # Comprobando formato del editor tkinter
+        formato = detecta_formato_tkinter(str_html_editor)
+        if not formato =='html':
+            tmb.showerror('ERROR DE FORMATO',f'Se detecta formato {formato.upper()}, no HTML')
+            return # evita que recorra más código
         
         # paso 2: Se obtiene objeto html con BeautifulSoup con la librería lxml que es más rápida
         html = BeautifulSoup(str_html_editor,'lxml')
@@ -274,6 +360,13 @@ def objetos_a_html(editor):
         # paso 1. Se obtiene el texto del editor
         texto_objetos = editor.get('1.0','end-1c') # 1c para evitar el \n final
         # de Tkinter, que da problemas
+
+        # Comprobando formato del editor tkinter
+        formato = detecta_formato_tkinter(texto_objetos)
+
+        if not formato =='objeto Producto':
+            tmb.showerror('ERROR DE FORMATO',f'Se detecta formato {formato.upper()}, no OBJETO PRODUCTO')
+            return # evita que recorra más código
 
         # paso 2. Se obtiene una lista de texto_objetos separando por \n
         lista_objetos = texto_objetos.split(sep='\n')
@@ -365,7 +458,57 @@ def csv_a_objetos(editor):
     Args:
         editor(ScrolledText): zona para editar/visualizar datos
     '''
-    pass
+    try:
+        # paso 1: Se obtiene texto del editor.
+        productos=[]
+        str_csv_editor = editor.get('1.0', 'end-1c')
+
+        # if str_csv_editor =='\n':
+        #     raise Exception('No hay libros o se ha cargado un csv no compatible.')
+
+        # Comprobando formato del editor tkinter
+        formato = detecta_formato_tkinter(str_csv_editor)
+        if not formato =='csv':
+            tmb.showerror('ERROR DE FORMATO',f'Se detecta formato {formato.upper()}, no CSV')
+            return # evita que recorra más código
+        
+        # Se comprueba si el csv (str_csv_editor) tiene cabecera
+        tiene_cabecera = csv.Sniffer().has_header(str_csv_editor)
+
+        # paso 2. Se convierte el texto_csv en lista_cadenas (split(sep='\n')) eliminando vacíos
+        lista_objetos = str_csv_editor.split(sep='\n')
+        # Lista de cadena sin vacíos
+        lista_cadenas = [cadena_csv for cadena_csv in lista_objetos if cadena_csv.strip()]
+
+        # paso 3: Se crea un iterador_lista_cadenas con iter(lista_cadenas)
+        iterador_lista_cadenas = iter(lista_cadenas) 
+        # paso 4: Se genera la lista de productos con los objetos Producto del csv
+        if tiene_cabecera:
+            next(iterador_lista_cadenas) # ignora la cabecera
+
+        for producto_csv in iterador_lista_cadenas:
+            #yield Producto(*fila) # descomponemos la list
+            productos.append(extraer_producto_de_csv(producto_csv))
+        
+        if not productos:
+            raise Exception("No hay productos 'libros' o se ha cargado"\
+                            " un csv no compatible.")        
+        
+    except SyntaxError:
+        tmb.showerror("Error", "Parece que la sintaxis no es CSV.")
+        # No se añade el icono "warning", aunque se puede probar 
+    except Exception as e:
+        tmb.showerror("Error", f'{e}')
+    else:
+        # paso 5. Se muestra en el editor los objetos Producto obtenidos.
+        # se muestra en el editor
+        editor.delete('1.0','end')
+
+        # "separador".join(COLECCIÓN_DE_ELEMENTOS) -> 2 opciones
+        texto_a_insertar = '\n'.join(str(producto) for producto in productos)
+
+        # se añade a la interfaz tkinter            
+        editor.insert(f'1.0',texto_a_insertar)
 
 
 def objetos_a_csv(editor):
@@ -373,7 +516,60 @@ def objetos_a_csv(editor):
     Args:
         editor(ScrolledText): zona para editar/visualizar datos
     '''
-    pass
+    try:
+        # paso 1. Se obtiene el texto del editor
+        texto_objetos = editor.get('1.0','end-1c') # 1c para evitar el \n final
+        # de Tkinter, que da problemas
+
+        # Comprobando formato del editor tkinter
+        formato = detecta_formato_tkinter(texto_objetos)
+        if not formato =='objeto Producto':
+            tmb.showerror('ERROR DE FORMATO',f'Se detecta formato {formato.upper()}, no OBJETO PRODUCTO')
+            return # evita que recorra más código
+
+        # paso 2. Se obtiene una lista de texto_objetos separando por \n
+        lista_objetos = texto_objetos.split(sep='\n')
+
+        # paso 3. Se quita basura ('')
+        while True:
+            try:
+                lista_objetos.remove('')
+            except ValueError:
+                break
+
+        if not lista_objetos:
+            raise Exception("No hay objetos.")
+    
+    except Exception as e:
+        tmb.showerror("Error", f'{e}')
+
+    else:
+        # paso 4: Se crea la cabecera en productos_csv
+        cabecera = ['genero','titulo','autor','precio','disponible']
+        productos_csv = ['genero, titulo, autor, precio, disponible']
+
+        # paso 5: Se pasa el contenido del editor a objetos Productos con el
+        # método eval para usarlo para generar el csv
+        for libro in lista_objetos:
+                    # Limpiando espacios en blanco para evitar errores
+            libro = libro.strip()
+            try:
+                prod = eval(libro) # se obtiene el objeto producto
+            except Exception as e:
+                tmb.showerror("Error", f'{e}')
+            else:
+                disponible = 'si' if prod.disponible == True else 'no'
+                linea_csv = f'{prod.genero},{prod.titulo},{prod.autor},'\
+                    f'{str(prod.precio)},{disponible}'
+                productos_csv.append(linea_csv)
+        
+        # mostramos en el editor
+        editor.delete('1.0','end')
+
+        # join es más eficiente que += => "separador".join(COLECCIÓN_DE_ELEMENTOS)
+        texto_a_insertar = "\n".join(str(producto) for producto in productos_csv)
+
+        editor.insert(f'1.0',texto_a_insertar)
 
 
 def como_productos(dct):
