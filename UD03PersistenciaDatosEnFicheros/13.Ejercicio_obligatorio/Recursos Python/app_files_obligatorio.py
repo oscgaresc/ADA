@@ -167,7 +167,7 @@ def detecta_formato_tkinter(str_editor):
         return "pickle"
 
     # Paso 6: se comprueba si es un objeto Producto
-    if (texto.startswith('Producto(') and texto.endswith(')')):
+    if (texto.startswith('Producto(')): # quito and texto.endswith(')') por si hay borrado de contenido
         return "objeto Producto"
 
     # Se añade al final debido a que se puede confundir con los formatos anteriores
