@@ -720,7 +720,47 @@ def pickle_a_objetos(editor): # VUELTA: Se debe ejecutar con el pickle en el edi
     Args:
         editor(ScrolledText): zona para editar/visualizar datos
     '''
-    pass
+    try:
+        # Se tiene en cuenta que los objetos_pickle (byte) están en la variable global
+        global lista_objetos_pickle
+        lista_productos=[] # se inicializa la lista
+
+        # Comprobando formato del editor tkinter
+        str_pickle_editor = editor.get('1.0', 'end-1c')        
+        formato = detecta_formato_tkinter(str_pickle_editor)
+        if not formato =='pickle':
+            tmb.showerror('ERROR DE FORMATO',f'Se detecta formato {formato.upper()}, no PICKLE')
+            return # evita que recorra más código
+
+        # Comprobando si hay lista de objetos_pickle, segunda defensa...
+        if not lista_objetos_pickle:
+            raise Exception("No hay datos en la variable global.")
+        
+        # No se recogen los datos del editor como hasta ahora
+        # paso 2. Se añade el contenido del editor a la lista de objetos mediante
+        # pickle.loads
+        lista_productos = pickle.loads(lista_objetos_pickle)
+
+        if not lista_productos:
+                raise Exception("No hay productos 'libros' o se ha cargado"\
+                                " un pickle no compatible.")        
+        
+    except SyntaxError:
+        tmb.showerror("Error", "Parece que la sintaxis no es PICKLE.")
+        # No se añade el icono "warning", aunque se puede probar 
+    except Exception as e:
+        tmb.showerror("Error", f'{e}')
+    else:
+        # paso 3. Se muestra en el editor los objetos Producto obtenidos.
+        # se muestra en el editor
+        editor.delete('1.0','end') # primero se borra
+
+        # "separador".join(COLECCIÓN_DE_ELEMENTOS) -> 2 opciones
+        texto_a_insertar = '\n'.join(str(producto) for producto in lista_productos)
+
+        # se añade los productos a la interfaz tkinter            
+        editor.insert(f'1.0',texto_a_insertar)
+        print(str(lista_objetos_pickle))
 
 def objetos_a_pickle(editor): # IDA: Se debe ejecutar con los productos en el editor
     '''serializa los objetos del editor a pickle (muestra el resultado en el editor)
@@ -729,7 +769,59 @@ def objetos_a_pickle(editor): # IDA: Se debe ejecutar con los productos en el ed
     Args:
         editor(ScrolledText): zona para editar/visualizar datos
     '''
-    pass
+    try:
+        # paso 1. Se vacia la variable global lista_objetos_pickle
+        global lista_objetos_pickle # para trabajar dentro de la función con la variable global
+        lista_objetos_pickle = [] # No utilizo clear porque pasa a bytes y no existe
+        
+        # paso 2. Se obtiene el texto del editor y se comprueba su formato
+        texto_objetos = editor.get('1.0','end-1c') # 1c para evitar el \n final
+        formato = detecta_formato_tkinter(texto_objetos)
+        if not formato =='objeto Producto':
+            tmb.showerror('ERROR DE FORMATO',f'Se detecta formato {formato.upper()}, no OBJETO PRODUCTO')
+            return # evita que recorra más código
+
+        # paso 3. Se obtiene una lista de texto_objetos separando por "\n"
+        lista_objetos = texto_objetos.split(sep='\n')
+
+        # paso 3. Se quita basura ('')
+        while True:
+            try:
+                lista_objetos.remove('')
+            except ValueError:
+                break
+
+        if not lista_objetos:
+            raise Exception("No hay objetos.")
+
+    except Exception as e:
+        tmb.showerror("Error", f'{e}')
+
+    else:
+        # paso 4: Se crea una variable productos_json inicializada a '[' eliminada
+        # se crea directamente una lista
+        lista_productos = []
+        # productos_json.append('[') # inicio del json
+        # paso 5: Se pasa el contenido del editor a objetos Productos con el
+        # método eval para usarlo para completar la lista de productos
+        for libro in lista_objetos:
+                    # Limpiando espacios en blanco para evitar errores
+            libro = libro.strip()
+            try:
+                prod = eval(libro) # se obtiene el objeto producto
+            except Exception as e:
+                tmb.showerror("Error", f'{e}')
+            else:
+                # Añado todos los productos a una lista de productos_json             
+                lista_productos.append(prod)
+
+        lista_objetos_pickle = pickle.dumps(lista_productos)
+
+        # paso 6. Se borra el editor
+        editor.delete('1.0','end')
+        # paso 7. Se añade la lista_objetos_pickle al editor (objetos byte) 
+        editor.insert(f'1.0', lista_objetos_pickle)
+        print(str(lista_objetos_pickle))
 #
 # INTERFAZ GRÁFICA
 #
